@@ -1,0 +1,60 @@
+name: E2E Tests - Cypress (JavaScript)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+
+env:
+  CYPRESS_CACHE_FOLDER: .cache/cypress
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ${{ env.CYPRESS_CACHE_FOLDER }}
+          key: ${{ runner.os }}-node-cypress-${{ hashFiles('package-lock.json', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-cypress-
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build project
+        run: npm run build --if-present
+        continue-on-error: true
+      
+      - name: Run E2E Tests
+        run: npx cypress run --spec "test/e2e-cypress/e2e/a11y/response-tabs.cy.js,test/e2e-cypress/e2e/bugs/4442.cy.js,test/e2e-cypress/e2e/bugs/4641.cy.js,test/e2e-cypress/e2e/bugs/4838.cy.js,test/e2e-cypress/e2e/bugs/4865.cy.js,test/e2e-cypress/e2e/bugs/4867.cy.js,test/e2e-cypress/e2e/bugs/4943.cy.js,test/e2e-cypress/e2e/bugs/5043.cy.js,test/e2e-cypress/e2e/bugs/5060.cy.js,test/e2e-cypress/e2e/bugs/5070.cy.js,test/e2e-cypress/e2e/bugs/5072.cy.js,test/e2e-cypress/e2e/bugs/5129.cy.js,test/e2e-cypress/e2e/bugs/5138.cy.js,test/e2e-cypress/e2e/bugs/5164.cy.js,test/e2e-cypress/e2e/bugs/5188.cy.js,test/e2e-cypress/e2e/bugs/5452.cy.js,test/e2e-cypress/e2e/bugs/5453.cy.js,test/e2e-cypress/e2e/bugs/5455.cy.js,test/e2e-cypress/e2e/bugs/5458.cy.js,test/e2e-cypress/e2e/bugs/5660.cy.js,test/e2e-cypress/e2e/bugs/6016.cy.js,test/e2e-cypress/e2e/bugs/6158.cy.js,test/e2e-cypress/e2e/bugs/6183.cy.js,test/e2e-cypress/e2e/bugs/6276.cy.js,test/e2e-cypress/e2e/bugs/6351.cy.js,test/e2e-cypress/e2e/bugs/6369.cy.js,test/e2e-cypress/e2e/bugs/6442.cy.js,test/e2e-cypress/e2e/bugs/6475.cy.js,test/e2e-cypress/e2e/bugs/6540.cy.js,test/e2e-cypress/e2e/bugs/6627.cy.js,test/e2e-cypress/e2e/bugs/7996.cy.js,test/e2e-cypress/e2e/bugs/8217.cy.js,test/e2e-cypress/e2e/bugs/editor-1868.cy.js,test/e2e-cypress/e2e/bugs/swos-63.cy.js,test/e2e-cypress/e2e/features/auth-bearer-flow.cy.js,test/e2e-cypress/e2e/features/auth-code-flow-pkce-without-secret.cy.js,test/e2e-cypress/e2e/features/deep-linking.cy.js,test/e2e-cypress/e2e/features/default-model-rendering.cy.js,test/e2e-cypress/e2e/features/dynamic-default-oauth.cy.js,test/e2e-cypress/e2e/features/external-docs.cy.js,test/e2e-cypress/e2e/features/info.cy.js,test/e2e-cypress/e2e/features/license.cy.js,test/e2e-cypress/e2e/features/model-collapse.cy.js,test/e2e-cypress/e2e/features/multiple-examples-core.cy.js,test/e2e-cypress/e2e/features/oas-badge.cy.js,test/e2e-cypress/e2e/features/oas3-callbacks.cy.js,test/e2e-cypress/e2e/features/oas3-multiple-media-type.cy.js,test/e2e-cypress/e2e/features/oas3-multiple-servers.cy.js,test/e2e-cypress/e2e/features/oas3-request-body-allow-empty-values.cy.js,test/e2e-cypress/e2e/features/oas3-request-body-default-views.cy.js,test/e2e-cypress/e2e/features/oas3-request-body-required.cy.js,test/e2e-cypress/e2e/features/oas3-user-edit-request-body-flows.cy.js,test/e2e-cypress/e2e/features/oas3-xml.cy.js,test/e2e-cypress/e2e/features/oas31-auth-mutual-tls.cy.js,test/e2e-cypress/e2e/features/parameter-array-missing-items.cy.js,test/e2e-cypress/e2e/features/parameter-order.cy.js,test/e2e-cypress/e2e/features/parameters-one-of-any-of.cy.js,test/e2e-cypress/e2e/features/request-body-upload-file.cy.js,test/e2e-cypress/e2e/features/response-empty-examples-object.cy.js,test/e2e-cypress/e2e/features/response-extension.cy.js,test/e2e-cypress/e2e/features/schema-form-enum-boolean.cy.js,test/e2e-cypress/e2e/features/schema-form.cy.js,test/e2e-cypress/e2e/features/spec-parse-to-json.cy.js,test/e2e-cypress/e2e/features/syntax-highlighting-json.cy.js,test/e2e-cypress/e2e/features/try-it-out-enabled.cy.js,test/e2e-cypress/e2e/features/try-it-out-non-200-response-body.cy.js,test/e2e-cypress/e2e/features/try-it-out-schema-required-override-allowed.cy.js,test/e2e-cypress/e2e/features/urls.cy.js,test/e2e-cypress/e2e/features/webhooks.cy.js,test/e2e-cypress/e2e/features/oauth2-flows/application.cy.js,test/e2e-cypress/e2e/features/oauth2-flows/password.cy.js,test/e2e-cypress/e2e/features/plugins/json-schema-2020-12/expansion.cy.js,test/e2e-cypress/e2e/features/plugins/json-schema-2020-12/schema-title.cy.js,test/e2e-cypress/e2e/features/plugins/oas3/all-of-circular-ref.cy.js,test/e2e-cypress/e2e/features/plugins/oas3/complex-spec.cy.js,test/e2e-cypress/e2e/features/plugins/oas3/one-of-any-of-example.cy.js,test/e2e-cypress/e2e/features/plugins/oas31/oas31-response-empty-content.cy.js,test/e2e-cypress/e2e/features/plugins/oas31/oas31-response-empty-media-type.cy.js,test/e2e-cypress/e2e/features/plugins/oas31/oas31-response-no-content.cy.js,test/e2e-cypress/e2e/features/plugins/oas31/oas31-webhook-examples.cy.js,test/e2e-cypress/e2e/features/plugins/topbar/linking-to-configured-urls.cy.js,test/e2e-cypress/e2e/security/anonymous.cy.js,test/e2e-cypress/e2e/security/apikey.cy.js,test/e2e-cypress/e2e/security/oauth2.cy.js,test/e2e-cypress/e2e/security/sequential-import-chaining.cy.js"
+        continue-on-error: false
+      
+      - name: Upload Cypress screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore
+      
+      - name: Upload Cypress videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-videos
+          path: cypress/videos
+          if-no-files-found: ignore
